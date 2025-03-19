@@ -13,20 +13,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function toggleDropdown() {
-    var dropdown = document.getElementById("dropdown-content");
-    var arrow = document.getElementById("arrow");
+    let dropdown = document.getElementById("dropdown-content");
     dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
 }
 
 function filterItems() {
-    var input = document.getElementById("searchBox");
-    var filter = input.value.toUpperCase();
-    var items = document.getElementById("items-container").getElementsByClassName("item-option");
-    var noResults = document.getElementById("noResults");
-    var visibleCount = 0;
+    let input = document.getElementById("searchBox");
+    let filter = input.value.toUpperCase();
+    let items = document.getElementById("items-container").getElementsByClassName("item-option");
+    let noResults = document.getElementById("noResults");
+    let visibleCount = 0;
 
-    for (var i = 0; i < items.length; i++) {
-        var txtValue = items[i].textContent || items[i].innerText;
+    for (let i = 0; i < items.length; i++) {
+        let txtValue = items[i].textContent || items[i].innerText;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
             items[i].style.display = "";
             visibleCount++;
@@ -44,8 +43,8 @@ function filterItems() {
 }
 
 function selectItem(item) {
-    var items = document.getElementsByClassName("item-option");
-    for (var i = 0; i < items.length; i++) {
+    let items = document.getElementsByClassName("item-option");
+    for (let i = 0; i < items.length; i++) {
         items[i].classList.remove("selected");
     }
 
@@ -162,8 +161,8 @@ window.onclick = function(event) {
     if (!event.target.matches('.dropdown-button') && !event.target.matches('.arrow') &&
         !event.target.matches('.dropdown-content') && !event.target.matches('.search-box') &&
         !event.target.matches('.item-option')) {
-        var dropdown = document.getElementById("dropdown-content");
-        var arrow = document.getElementById("arrow");
+        let dropdown = document.getElementById("dropdown-content");
+        let arrow = document.getElementById("arrow");
         if (dropdown.style.display === "block") {
             dropdown.style.display = "none";
             arrow.classList.remove("arrow-up");
