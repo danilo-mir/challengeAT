@@ -186,3 +186,14 @@ tr:hover {
     border-radius: 8px;
     margin-top: 15px;
 }
+
+.user-info {
+    text-align: right;
+    margin-bottom: 20px;
+    color: #666;
+}
+
+.user-info p {
+    margin: 0;
+    font-size: 14px;
+}

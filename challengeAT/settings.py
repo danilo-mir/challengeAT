@@ -122,3 +122,7 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usar banco de dados para sessões
+SESSION_COOKIE_AGE = 86400  # Tempo de vida da sessão em segundos (24 horas)
+SESSION_SAVE_EVERY_REQUEST = True  # Salvar a sessão em cada request

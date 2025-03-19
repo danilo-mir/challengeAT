@@ -4,10 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Básica</title>
+    <title>Monitoramento de ativos</title>
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
 </head>
 <body>
+    <div class="user-info">
+        <p>Email: <span id="user_email">{{ request.session.user_email }}</span></p>
+    </div>
+
     <h1>Monitoramento de ativos</h1>
 
     <div class="dropdown">
@@ -45,5 +49,8 @@
     </div>
 
     <script src="{% static 'js/home.js' %}"></script>
+    <script>
+        const userAssets = {{ user_assets|safe }};
+    </script>
 </body>
 </html>

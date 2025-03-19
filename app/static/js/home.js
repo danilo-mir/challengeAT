@@ -1,20 +1,34 @@
 let selectedItem = null;
-
 let selectedItems = [];
 
-// Verify local storage
+// Verify user's assets from database
 document.addEventListener('DOMContentLoaded', function() {
-    const savedItems = localStorage.getItem('selectedItems');
-    if (savedItems) {
-        selectedItems = JSON.parse(savedItems);
+    // Check if we have user assets from the server
+    if (typeof userAssets !== 'undefined' && userAssets.length > 0) {
+        // Use assets from the server
+        selectedItems = userAssets;
         updateTable();
+    } else {
+        // Fallback to localStorage if no server data is available
+        const savedItems = localStorage.getItem('selectedItems');
+        if (savedItems) {
+            selectedItems = JSON.parse(savedItems);
+            updateTable();
+        }
     }
     checkEmptyTable();
 });
 
 function toggleDropdown() {
     let dropdown = document.getElementById("dropdown-content");
-    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    let arrow = document.getElementById("arrow");
+    if (dropdown.style.display === "block") {
+        dropdown.style.display = "none";
+        arrow.classList.remove("arrow-up");
+    } else {
+        dropdown.style.display = "block";
+        arrow.classList.add("arrow-up");
+    }
 }
 
 function filterItems() {
@@ -50,7 +64,6 @@ function selectItem(item) {
 
     item.classList.add("selected");
 
-
     selectedItem = {
         id: item.getAttribute("data-id"),
         name: item.innerText
@@ -60,18 +73,19 @@ function selectItem(item) {
         selectedItems.push({
             id: selectedItem.id,
             name: selectedItem.name,
-            upperTunnel: '',
-            lowerTunnel: '',
-            checkPeriod: ''
+            upperTunnel: '0',
+            lowerTunnel: '0',
+            checkPeriod: '0'
         });
 
         saveItemsToLocalStorage();
-
+        saveItemsToServer();
         updateTable();
     }
 
     // Close dropdown
     document.getElementById("dropdown-content").style.display = "none";
+    document.getElementById("arrow").classList.remove("arrow-up");
 }
 
 function updateTable() {
@@ -93,6 +107,7 @@ function updateTable() {
         upperTunnelInput.onchange = function() {
             item.upperTunnel = this.value;
             saveItemsToLocalStorage();
+            saveItemsToServer();
         };
         upperTunnelCell.appendChild(upperTunnelInput);
         row.appendChild(upperTunnelCell);
@@ -105,6 +120,7 @@ function updateTable() {
         lowerTunnelInput.onchange = function() {
             item.lowerTunnel = this.value;
             saveItemsToLocalStorage();
+            saveItemsToServer();
         };
         lowerTunnelCell.appendChild(lowerTunnelInput);
         row.appendChild(lowerTunnelCell);
@@ -117,6 +133,7 @@ function updateTable() {
         periodInput.onchange = function() {
             item.checkPeriod = this.value;
             saveItemsToLocalStorage();
+            saveItemsToServer();
         };
         periodCell.appendChild(periodInput);
         row.appendChild(periodCell);
@@ -140,11 +157,34 @@ function updateTable() {
 function deleteItem(index) {
     selectedItems.splice(index, 1);
     saveItemsToLocalStorage();
+    saveItemsToServer();
     updateTable();
 }
 
 function saveItemsToLocalStorage() {
     localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
+}
+
+function saveItemsToServer() {
+    // Send the selected items to the server
+    fetch('/save-assets/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            assets: selectedItems
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            console.error('Error saving assets:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error saving assets:', error);
+    });
 }
 
 function checkEmptyTable() {
