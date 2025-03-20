@@ -5,6 +5,7 @@ import requests
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime
 from .models import Assets
 
 # Create your views here.
@@ -92,7 +93,8 @@ def save_assets(request):
                     ticker=asset['id'],
                     upper_tunnel=upper_tunnel,
                     lower_tunnel=lower_tunnel,
-                    check_period=check_period
+                    check_period=check_period,
+                    last_check=datetime.min
                 )
 
             return JsonResponse({"success": True})
