@@ -1,5 +1,6 @@
 let selectedItem = null;
 let selectedItems = [];
+let currentAssetToAdd = null;
 
 // Verify user's assets from database
 document.addEventListener('DOMContentLoaded', function() {
@@ -17,7 +18,63 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     checkEmptyTable();
+
+    // Setup modal event listeners
+    setupModalListeners();
 });
+
+function setupModalListeners() {
+    // Get modal elements
+    const modal = document.getElementById('parametersModal');
+    const closeButton = modal.querySelector('.close-button');
+    const form = document.getElementById('parametersForm');
+    const cancelButton = modal.querySelector('.cancel-btn');
+
+    // Close modal when clicking on X button
+    closeButton.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+
+    // Close modal when clicking on Cancel button
+    cancelButton.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+
+    // Close modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        if (currentAssetToAdd) {
+            const upperTunnel = document.getElementById('upperTunnel').value;
+            const lowerTunnel = document.getElementById('lowerTunnel').value;
+            const checkPeriod = document.getElementById('checkPeriod').value;
+
+            // Add the item with parameters
+            selectedItems.push({
+                id: currentAssetToAdd.id,
+                name: currentAssetToAdd.name,
+                upperTunnel: upperTunnel,
+                lowerTunnel: lowerTunnel,
+                checkPeriod: checkPeriod
+            });
+
+            saveItemsToServer();
+            updateTable();
+
+            // Reset and close modal
+            form.reset();
+            // modal.style.display = 'none';
+            currentAssetToAdd = null;
+        }
+    });
+}
 
 function toggleDropdown() {
     let dropdown = document.getElementById("dropdown-content");
@@ -70,22 +127,30 @@ function selectItem(item) {
     };
 
     if (!selectedItems.some(existingItem => existingItem.id === selectedItem.id)) {
-        selectedItems.push({
-            id: selectedItem.id,
-            name: selectedItem.name,
-            upperTunnel: '0',
-            lowerTunnel: '0',
-            checkPeriod: '0'
-        });
-
-        saveItemsToLocalStorage();
-        saveItemsToServer();
-        updateTable();
+        // Show modal for parameter input
+        showParametersModal(selectedItem);
+    } else {
+        // Asset already added, show notification
+        alert(`O ativo ${selectedItem.name} já está na sua lista de monitoramento.`);
     }
 
     // Close dropdown
     document.getElementById("dropdown-content").style.display = "none";
     document.getElementById("arrow").classList.remove("arrow-up");
+}
+
+function showParametersModal(item) {
+    // Set current asset being added
+    currentAssetToAdd = item;
+
+    // Update asset name in modal
+    document.getElementById('assetName').textContent = item.name;
+
+    // Reset form if it has previous values
+    document.getElementById('parametersForm').reset();
+
+    // Show modal
+    document.getElementById('parametersModal').style.display = 'block';
 }
 
 function updateTable() {
@@ -100,42 +165,15 @@ function updateTable() {
         row.appendChild(nameCell);
 
         const upperTunnelCell = document.createElement('td');
-        const upperTunnelInput = document.createElement('input');
-        upperTunnelInput.type = 'text';
-        upperTunnelInput.className = 'editable';
-        upperTunnelInput.value = item.upperTunnel;
-        upperTunnelInput.onchange = function() {
-            item.upperTunnel = this.value;
-            saveItemsToLocalStorage();
-            saveItemsToServer();
-        };
-        upperTunnelCell.appendChild(upperTunnelInput);
+        upperTunnelCell.textContent = item.upperTunnel;
         row.appendChild(upperTunnelCell);
 
         const lowerTunnelCell = document.createElement('td');
-        const lowerTunnelInput = document.createElement('input');
-        lowerTunnelInput.type = 'text';
-        lowerTunnelInput.className = 'editable';
-        lowerTunnelInput.value = item.lowerTunnel;
-        lowerTunnelInput.onchange = function() {
-            item.lowerTunnel = this.value;
-            saveItemsToLocalStorage();
-            saveItemsToServer();
-        };
-        lowerTunnelCell.appendChild(lowerTunnelInput);
+        lowerTunnelCell.textContent = item.lowerTunnel;
         row.appendChild(lowerTunnelCell);
 
         const periodCell = document.createElement('td');
-        const periodInput = document.createElement('input');
-        periodInput.type = 'text';
-        periodInput.className = 'editable';
-        periodInput.value = item.checkPeriod;
-        periodInput.onchange = function() {
-            item.checkPeriod = this.value;
-            saveItemsToLocalStorage();
-            saveItemsToServer();
-        };
-        periodCell.appendChild(periodInput);
+        periodCell.textContent = item.checkPeriod;
         row.appendChild(periodCell);
 
         const actionCell = document.createElement('td');
@@ -156,13 +194,8 @@ function updateTable() {
 
 function deleteItem(index) {
     selectedItems.splice(index, 1);
-    saveItemsToLocalStorage();
     saveItemsToServer();
     updateTable();
-}
-
-function saveItemsToLocalStorage() {
-    localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
 }
 
 function saveItemsToServer() {

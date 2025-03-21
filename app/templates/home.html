@@ -14,6 +14,7 @@
 
     <h1>Monitoramento de ativos</h1>
 
+    <!--- Dropdown for asset selection --->
     <div class="dropdown">
         <button class="dropdown-button" onclick="toggleDropdown()">
             <span id="selected-text">Selecione os ativos</span>
@@ -30,8 +31,35 @@
         </div>
     </div>
 
+    <!-- Modal for input forms -->
+    <div id="parametersModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Definir parâmetros para <span id="assetName"></span></h3>
+            <form id="parametersForm">
+                <div class="form-group">
+                    <label for="upperTunnel">Túnel Superior:</label>
+                    <input type="number" id="upperTunnel" name="upperTunnel" value="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="lowerTunnel">Túnel Inferior:</label>
+                    <input type="number" id="lowerTunnel" name="lowerTunnel" value="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="checkPeriod">Período de Checagem (min):</label>
+                    <input type="number" id="checkPeriod" name="checkPeriod" value="0" min="0" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">Adicionar</button>
+                    <button type="button" class="cancel-btn">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!--- Table --->
     <div class="table-container">
-        <h2>Ativos Selecionados</h2>
+        <h2>Ativos Selecionados para Monitoramento</h2>
         <table id="items-table">
             <thead>
                 <tr>
@@ -39,7 +67,7 @@
                     <th>Túnel Superior</th>
                     <th>Túnel Inferior</th>
                     <th>Período de Checagem (min)</th>
-                    <th></th>
+                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody id="table-body">
