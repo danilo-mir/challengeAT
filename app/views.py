@@ -93,8 +93,7 @@ def save_assets(request):
                     ticker=asset['id'],
                     upper_tunnel=upper_tunnel,
                     lower_tunnel=lower_tunnel,
-                    check_period=check_period,
-                    last_check=datetime.min
+                    check_period=check_period
                 )
 
             return JsonResponse({"success": True})
