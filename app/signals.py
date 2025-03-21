@@ -17,7 +17,7 @@ def new_asset_verification_task(sender, instance, created, **kwargs):
 
         PeriodicTask.objects.create(
             interval=interval,
-            name=f"{instance.id}",
+            name="_".join((str(instance.user), str(instance.ticker))),
             task="app.tasks.price_tunnel_check",
             kwargs=json.dumps({"asset_ticker": instance.ticker}),
             start_time=timezone.now(),
@@ -27,7 +27,7 @@ def new_asset_verification_task(sender, instance, created, **kwargs):
 
 @receiver(post_delete, sender=Assets)
 def delete_asset_verification_task(sender, instance, **kwargs):
-    task_name = f"{instance.id}"
+    task_name = "_".join((str(instance.user), str(instance.ticker)))
     task = PeriodicTask.objects.filter(name=task_name)
     if task.exists():
         task.delete()
