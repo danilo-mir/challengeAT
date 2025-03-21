@@ -15,7 +15,6 @@ django-timezone-field==7.1
 dotenv==0.9.9
 idna==3.10
 kombu==5.5.0
-pip==23.2.1
 prompt_toolkit==3.0.50
 python-crontab==3.2.0
 python-dateutil==2.9.0.post0

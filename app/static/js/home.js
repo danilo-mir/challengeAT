@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupModalListeners() {
     // Get modal elements
     const modal = document.getElementById('parametersModal');
+    const modalContent = modal.querySelector('.modal-content');
     const closeButton = modal.querySelector('.close-button');
     const form = document.getElementById('parametersForm');
     const cancelButton = modal.querySelector('.cancel-btn');
@@ -40,8 +41,9 @@ function setupModalListeners() {
         modal.style.display = 'none';
     });
 
-    // Close modal when clicking outside of it
-    window.addEventListener('click', function(event) {
+    // Close modal when clicking outside the modal content
+    modal.addEventListener('click', function(event) {
+        // If the click is on the modal background (not on modal content)
         if (event.target === modal) {
             modal.style.display = 'none';
         }
@@ -70,12 +72,11 @@ function setupModalListeners() {
 
             // Reset and close modal
             form.reset();
-            // modal.style.display = 'none';
+            modal.style.display = 'none';
             currentAssetToAdd = null;
         }
     });
 }
-
 function toggleDropdown() {
     let dropdown = document.getElementById("dropdown-content");
     let arrow = document.getElementById("arrow");
