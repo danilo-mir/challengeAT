@@ -9,13 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Use assets from the server
         selectedItems = userAssets;
         updateTable();
-    } else {
-        // Fallback to localStorage if no server data is available
-        const savedItems = localStorage.getItem('selectedItems');
-        if (savedItems) {
-            selectedItems = JSON.parse(savedItems);
-            updateTable();
-        }
     }
     checkEmptyTable();
 
@@ -57,6 +50,7 @@ function setupModalListeners() {
             const upperTunnel = document.getElementById('upperTunnel').value;
             const lowerTunnel = document.getElementById('lowerTunnel').value;
             const checkPeriod = document.getElementById('checkPeriod').value;
+            const lastPrice = 0
 
             // Add the item with parameters
             selectedItems.push({
@@ -64,7 +58,8 @@ function setupModalListeners() {
                 name: currentAssetToAdd.name,
                 upperTunnel: upperTunnel,
                 lowerTunnel: lowerTunnel,
-                checkPeriod: checkPeriod
+                checkPeriod: checkPeriod,
+                lastPrice: lastPrice
             });
 
             saveItemsToServer();
@@ -177,17 +172,32 @@ function updateTable() {
         periodCell.textContent = item.checkPeriod;
         row.appendChild(periodCell);
 
-        const actionCell = document.createElement('td');
+        const lastPrice = document.createElement('td');
+        lastPrice.textContent = item.lastPrice;
+        row.appendChild(lastPrice);
+
+        const refreshCell = document.createElement('td');
+        const refreshButton = document.createElement('button');
+        refreshButton.className = 'refresh-btn';
+        refreshButton.textContent = '\u27f3';
+        refreshButton.onclick = function () {
+            refreshRow(index);
+        }
+        refreshCell.appendChild(refreshButton);
+        row.appendChild(refreshCell);
+
+        const deleteCell = document.createElement('td');
         const deleteButton = document.createElement('button');
         deleteButton.className = 'delete-btn';
-        deleteButton.textContent = 'Deletar';
+        deleteButton.textContent = 'x';
         deleteButton.onclick = function() {
             deleteItem(index);
         };
-        actionCell.appendChild(deleteButton);
-        row.appendChild(actionCell);
+        deleteCell.appendChild(deleteButton);
+        row.appendChild(deleteCell);
 
         tableBody.appendChild(row);
+
     });
 
     checkEmptyTable();
@@ -197,6 +207,19 @@ function deleteItem(index) {
     selectedItems.splice(index, 1);
     saveItemsToServer();
     updateTable();
+}
+
+function refreshRow(index) {
+    const item = selectedItems[index];
+    getItemInfo(item.id).then(data => {
+        if (data) {
+            item.upperTunnel = data.upperTunnel;
+            item.lowerTunnel = data.lowerTunnel;
+            item.checkPeriod = data.checkPeriod;
+            item.lastPrice = data.lastPrice;
+            updateTable();
+        }
+    }).catch(error => console.error('Erro ao atualizar ativo:', error));
 }
 
 function saveItemsToServer() {
@@ -221,7 +244,20 @@ function saveItemsToServer() {
     });
 }
 
-function checkEmptyTable() {
+async function getItemInfo(assetId) {
+    try {
+        const response = await fetch(`/get-asset-info/?ticker=${assetId}`);
+        if (!response.ok) {
+            throw new Error('Erro ao buscar ativo');
+            }
+        return await response.json();
+    } catch (error) {
+        console.error('Erro ao buscar o ativo:', error);
+        return null;
+    }
+}
+
+function  checkEmptyTable() {
     const emptyMessage = document.getElementById('empty-table-message');
     if (selectedItems.length === 0) {
         emptyMessage.style.display = 'block';

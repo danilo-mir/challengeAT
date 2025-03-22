@@ -115,14 +115,14 @@ p {
 
 /* Modal */
 .modal {
-    position: fixed; /* Fica sobreposto a tudo */
-    z-index: 1000; /* Acima de outros elementos */
+    display: flex;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
     justify-content: center;
     align-items: center;
 }
@@ -277,6 +277,20 @@ tr:hover {
     outline: none;
     border-color: #1890ff;
     box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.refresh-btn {
+    background-color: #4d5fff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.refresh-btn:hover {
+    background-color: #75b5ff;
 }
 
 .delete-btn {

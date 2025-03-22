@@ -31,6 +31,9 @@ def price_tunnel_check(task_user, asset_ticker):
             if asset_data:
                 asset_price = asset_data[0].get("regularMarketPrice")
 
+                asset.last_price = asset_price
+                asset.save()
+
                 if asset_price <= lower_tunnel:
                     email_subject = f"Aviso de compra de {ticker}"
                     email_body = f"""

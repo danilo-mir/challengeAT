@@ -9,4 +9,4 @@ class Assets(models.Model):
     lower_tunnel = models.FloatField()
     upper_tunnel = models.FloatField()
     check_period = models.FloatField()
-
+    last_price = models.FloatField(default=0)

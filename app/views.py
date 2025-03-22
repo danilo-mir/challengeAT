@@ -20,6 +20,7 @@ def login(request):
     if request.method == 'POST':
         email = request.POST.get("email")
         if email:
+            request.session.flush()
             request.session["user_email"] = email
             request.session.modified = True
             return redirect("/home")
@@ -103,3 +104,17 @@ def save_assets(request):
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
+@csrf_exempt
+def get_asset_info(request):
+    ticker = request.GET.get('ticker')
+    user_email = request.session.get('user_email')
+    print("ticker:", ticker)
+    print("mail:", user_email)
+    asset = Assets.objects.get(user=user_email, ticker=ticker)
+    print(asset.last_price)
+    return JsonResponse({
+        "upperTunnel": asset.upper_tunnel,
+        "lowerTunnel": asset.lower_tunnel,
+        "checkPeriod": asset.check_period,
+        "lastPrice": asset.last_price
+    })
