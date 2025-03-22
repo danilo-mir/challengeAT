@@ -3,7 +3,7 @@ import requests
 from dotenv import load_dotenv
 from app.models import Assets
 from celery import shared_task
-from utils import send_email
+from app.utils import send_email
 
 
 @shared_task
