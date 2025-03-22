@@ -7,14 +7,14 @@ from app.utils import send_email
 
 
 @shared_task
-def price_tunnel_check(asset_ticker):
+def price_tunnel_check(task_user, asset_ticker):
     try:
         load_dotenv()
 
         email_sender_account = str(os.getenv("EMAIL_ACCOUNT"))
         email_sender_password = str(os.getenv("EMAIL_PASSWORD"))
 
-        asset = Assets.objects.get(ticker=asset_ticker)
+        asset = Assets.objects.get(user=task_user, ticker=asset_ticker)
         user = asset.user
         ticker = asset.ticker
         lower_tunnel = asset.lower_tunnel

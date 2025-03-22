@@ -21,7 +21,7 @@ def new_asset_verification_task(sender, instance, created, **kwargs):
             interval=interval,
             name=task_name,
             task="app.tasks.price_tunnel_check",
-            kwargs=json.dumps({"asset_ticker": instance.ticker}),
+            kwargs=json.dumps({"task_user": instance.user, "asset_ticker": instance.ticker}),
             start_time=timezone.now(),
             enabled=True
         )
