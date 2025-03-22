@@ -3,21 +3,24 @@ import requests
 from dotenv import load_dotenv
 from app.models import Assets
 from celery import shared_task
-
-load_dotenv()
-brapi_key = os.getenv("BRAPI_KEY")
+from utils import send_email
 
 
 @shared_task
 def price_tunnel_check(asset_ticker):
     try:
+        load_dotenv()
+
+        email_sender_account = str(os.getenv("EMAIL_ACCOUNT"))
+        email_sender_password = str(os.getenv("EMAIL_PASSWORD"))
+
         asset = Assets.objects.get(ticker=asset_ticker)
+        user = asset.user
         ticker = asset.ticker
         lower_tunnel = asset.lower_tunnel
-        print(lower_tunnel)
         upper_tunnel = asset.upper_tunnel
-        print(upper_tunnel)
 
+        brapi_key = os.getenv("BRAPI_KEY")
         url = f"https://brapi.dev/api/quote/{ticker}?token={brapi_key}"
         response = requests.get(url)
 
@@ -27,15 +30,34 @@ def price_tunnel_check(asset_ticker):
 
             if asset_data:
                 asset_price = asset_data[0].get("regularMarketPrice")
-                print(asset_price)
 
-                if asset_price < lower_tunnel:
-                    print("Abaixo do tunel")
-                # TODO: send buy email
+                if asset_price <= lower_tunnel:
+                    email_subject = f"Aviso de compra de {ticker}"
+                    email_body = f"""
+                    O preço do ativo {ticker} atualmente é de {asset_price}, que está abaixo do valor de túnel inferior
+                    configurado, que é de {lower_tunnel}. Portanto, sugere-se a compra do ativo.
+                    """
+                    send_email(
+                        sender=email_sender_account,
+                        password=email_sender_password,
+                        recipient=user,
+                        subject=email_subject,
+                        body=email_body
+                    )
 
-                if asset_price > upper_tunnel:
-                    print("Acima do tunel")
-                # TODO: send sell email
+                if asset_price >= upper_tunnel:
+                    email_subject = f"Aviso de venda de {ticker}"
+                    email_body = f"""
+                    O preço do ativo {ticker} atualmente é de {asset_price}, que está acima do valor de túnel superior
+                    configurado, que é de {upper_tunnel}. Portanto, sugere-se a venda do ativo.
+                    """
+                    send_email(
+                        sender=email_sender_account,
+                        password=email_sender_password,
+                        recipient=user,
+                        subject=email_subject,
+                        body=email_body
+                    )
 
     except Exception as e:
         print(f"Error trying to verify asset {asset_ticker}: {e}")
